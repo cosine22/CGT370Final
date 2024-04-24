@@ -40,7 +40,19 @@
     <main>
       <h1 style="font-style: italic">Old Masters v New Masters</h1>
       <div id="chart"></div>
+      <p style="color: white; font-size: larger; width: 50%">
+        This chart visualizes the change in farthest annual drive over the
+        course of 30 years. There is a clear trend upwards since 1993, which
+        could either be the doing of better technology (improved club design),
+        and or newer, better studied techniques.
+      </p>
       <div id="chart2"></div>
+      <p style="color: white; font-size: larger; width: 50%">
+        This chart visualizes the change in highest accuracy among golfers
+        annualy. Accuracy is measured by percentage of fairways hit. Unlike the
+        previous graph, this variable seems to decrease over time, however there
+        it is not very linear.
+      </p>
       <div
         class="tableauPlaceholder"
         id="viz1713925106173"
@@ -87,11 +99,16 @@
           "https://public.tableau.com/javascripts/api/viz_v1.js";
         vizElement.parentNode.insertBefore(scriptElement, vizElement);
       </script>
+      <p style="color: white; font-size: larger; width: 50%">
+        This chart shows golfers among different eras, and compares their number
+        of weeks ranked #1, and how many majors they actually won. Besides a few
+        outliers, the competition has stayed relatively balanced.
+      </p>
 
       <div
         class="tableauPlaceholder"
         id="viz1713929986552"
-        style="position: relative; margin: 0 auto"
+        style="position: relative; margin: 0 auto; margin-top: 50px"
       >
         <noscript
           ><a href="#"
@@ -122,14 +139,23 @@
       <script type="text/javascript">
         var divElement = document.getElementById("viz1713929986552");
         var vizElement = divElement.getElementsByTagName("object")[0];
-        vizElement.style.width = "80%";
+        vizElement.style.width = "90%";
         vizElement.style.height = 700 + "px";
         var scriptElement = document.createElement("script");
         scriptElement.src =
           "https://public.tableau.com/javascripts/api/viz_v1.js";
         vizElement.parentNode.insertBefore(scriptElement, vizElement);
       </script>
+      <p style="color: white; font-size: larger; width: 50%">
+        This is a chart of the golfers with the most career PGA Tour Wins.
+      </p>
       <div id="chart3"></div>
+      <p style="color: white; font-size: larger; width: 50%">
+        This chart visualizes annual best average, and the annual worst average
+        distance to hole on fairways. It can be noted that over the past twenty
+        years, the floor and ceiling in the PGA have not varied very much at
+        all.
+      </p>
     </main>
   </body>
   <script>
@@ -441,7 +467,7 @@
       svg3
         .append("text")
         .attr("x", width / 2)
-        .attr("y", height + margin.bottom / 2)
+        .attr("y", height + margin.bottom / 2 + 10)
         .attr("text-anchor", "middle")
         .attr("font-size", "14px")
         .text("Distance (inches)");
