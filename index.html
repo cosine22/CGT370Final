@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Master's Data</title>
+    <link rel="stylesheet" href="./style.css" />
+    <!-- <link rel="icon" href="./favicon.ico" type="image/x-icon" /> -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <style>
+      #chart {
+        background-color: white;
+      }
+      .tooltip {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        pointer-events: none;
+      }
+      #chart2 {
+        margin-top: 100px;
+        background-color: white;
+      }
+
+      #chart3 {
+        margin-top: 100px;
+        background-color: white;
+      }
+      .bar {
+        fill: #003c80;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <h1 style="font-style: italic">Old Masters v New Masters</h1>
+      <div id="chart"></div>
+      <div id="chart2"></div>
+      <div
+        class="tableauPlaceholder"
+        id="viz1713925106173"
+        style="
+          position: relative;
+          margin: 0 auto;
+          margin-top: 50px;
+          margin-bottom: 50px;
+        "
+      >
+        <noscript
+          ><a href="#"
+            ><img
+              alt="Weeks Spent as the #1 Ranked Golfer vs. Number of Major Victories "
+              src="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;We&#47;WeeksRanked&#47;Sheet1&#47;1_rss.png"
+              style="border: none" /></a></noscript
+        ><object class="tableauViz" style="display: none">
+          <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+          <param name="embed_code_version" value="3" />
+          <param name="site_root" value="" />
+          <param name="name" value="WeeksRanked&#47;Sheet1" />
+          <param name="tabs" value="no" />
+          <param name="toolbar" value="yes" />
+          <param
+            name="static_image"
+            value="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;We&#47;WeeksRanked&#47;Sheet1&#47;1.png"
+          />
+          <param name="animate_transition" value="yes" />
+          <param name="display_static_image" value="yes" />
+          <param name="display_spinner" value="yes" />
+          <param name="display_overlay" value="yes" />
+          <param name="display_count" value="yes" />
+          <param name="language" value="en-US" />
+          <param name="filter" value="publish=yes" />
+        </object>
+      </div>
+      <script type="text/javascript">
+        var divElement = document.getElementById("viz1713925106173");
+        var vizElement = divElement.getElementsByTagName("object")[0];
+        vizElement.style.width = "100%";
+        vizElement.style.height = 700 + "px";
+        var scriptElement = document.createElement("script");
+        scriptElement.src =
+          "https://public.tableau.com/javascripts/api/viz_v1.js";
+        vizElement.parentNode.insertBefore(scriptElement, vizElement);
+      </script>
+
+      <div
+        class="tableauPlaceholder"
+        id="viz1713929986552"
+        style="position: relative; margin: 0 auto"
+      >
+        <noscript
+          ><a href="#"
+            ><img
+              alt="Most PGA Tour Wins "
+              src="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Mo&#47;MostPGATourWins&#47;Sheet1&#47;1_rss.png"
+              style="border: none" /></a></noscript
+        ><object class="tableauViz" style="display: none">
+          <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+          <param name="embed_code_version" value="3" />
+          <param name="site_root" value="" />
+          <param name="name" value="MostPGATourWins&#47;Sheet1" />
+          <param name="tabs" value="no" />
+          <param name="toolbar" value="yes" />
+          <param
+            name="static_image"
+            value="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Mo&#47;MostPGATourWins&#47;Sheet1&#47;1.png"
+          />
+          <param name="animate_transition" value="yes" />
+          <param name="display_static_image" value="yes" />
+          <param name="display_spinner" value="yes" />
+          <param name="display_overlay" value="yes" />
+          <param name="display_count" value="yes" />
+          <param name="language" value="en-US" />
+          <param name="filter" value="publish=yes" />
+        </object>
+      </div>
+      <script type="text/javascript">
+        var divElement = document.getElementById("viz1713929986552");
+        var vizElement = divElement.getElementsByTagName("object")[0];
+        vizElement.style.width = "80%";
+        vizElement.style.height = 700 + "px";
+        var scriptElement = document.createElement("script");
+        scriptElement.src =
+          "https://public.tableau.com/javascripts/api/viz_v1.js";
+        vizElement.parentNode.insertBefore(scriptElement, vizElement);
+      </script>
+      <div id="chart3"></div>
+    </main>
+  </body>
+  <script>
+    const width = 800;
+    const height = 400;
+    const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+
+    const tooltip = d3
+      .select("#chart")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // Append SVG to the container
+    const svg = d3
+      .select("#chart")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    // Load data (assuming you have a CSV file with years and golf driving averages)
+    d3.csv("DrivingAvg(YrlyTop).csv").then((data) => {
+      // Convert strings to numbers
+      data.forEach((d) => {
+        // console.log(d);
+        d.year = +d.year;
+        d.name = d.name;
+        d.average = +d.average;
+      });
+
+      // Define scales
+      const xScale = d3
+        .scaleLinear()
+        .domain(d3.extent(data, (d) => d.year))
+        .range([0, width]);
+
+      const yScale = d3
+        .scaleLinear()
+        .domain([250, d3.max(data, (d) => d.average)])
+        .range([height, 0]);
+
+      // Define line function
+      const line = d3
+        .line()
+        .x((d) => xScale(d.year))
+        .y((d) => yScale(d.average));
+
+      console.log(data);
+
+      // Append circles for data points
+      svg
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => xScale(d.year))
+        .attr("cy", (d) => yScale(d.average))
+        .attr("r", 5)
+        .attr("fill", "steelblue")
+        .on("mouseover", function (event, d) {
+          tooltip.transition().duration(200).style("opacity", 0.9);
+          const tooltipX =
+            event.pageX - document.getElementById("chart").offsetLeft; // Adjusted X position
+          const tooltipY =
+            event.pageY - document.getElementById("chart").offsetTop; // Adjusted Y position
+          tooltip
+            .html(
+              `Name: ${data[d].name}<br/>Year: ${data[d].year}<br/>Average: ${data[d].average}`
+            )
+            .style("left", tooltipX + "px")
+            .style("top", tooltipY + "px");
+        })
+        .on("mouseout", function (d) {
+          tooltip.transition().duration(500).style("opacity", 0);
+        });
+
+      // Append lines connecting the data points
+      svg
+        .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+      // Append axes
+      svg
+        .append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale).tickFormat(d3.format("d")));
+
+      svg.append("g").call(d3.axisLeft(yScale));
+
+      svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", -margin.top / 2)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text("Farthest Annual Driving Average Over 30 Years");
+
+      svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom - 5)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text("Year");
+
+      svg
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -margin.left * 0.7)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text("Yards");
+    });
+  </script>
+  <script>
+    const tooltip2 = d3
+      .select("#chart2")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // Append SVG to the container
+    const svg2 = d3
+      .select("#chart2")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right + 50)
+      .attr("height", 500 + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    // Load data (assuming you have a CSV file with years and golf driving averages)
+    d3.csv("DrivingAccuracy(Top).csv").then((data) => {
+      // Convert strings to numbers
+      data.forEach((d) => {
+        console.log(d);
+        d.year = +d.year;
+        d.name = d.name;
+        d.accuracy = +d.accuracy;
+      });
+
+      // Find the golfer with the highest accuracy
+      const highestAccuracy = d3.max(data, (d) => d.accuracy);
+      const highestGolfer = data.find((d) => d.accuracy === highestAccuracy);
+
+      // Define scales
+      const xScale = d3
+        .scaleLinear()
+        .domain([70, highestAccuracy])
+        .range([0, width]);
+
+      const yScale = d3
+        .scaleBand()
+        .domain(data.map((d) => d.year))
+        .range([0, 500])
+        .padding(0.3);
+
+      // Append bars
+      svg2
+        .selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("y", (d) => yScale(d.year))
+        .attr("height", yScale.bandwidth())
+        .attr("x", 0)
+        .attr("width", (d) => xScale(d.accuracy));
+
+      // Append text for golfer names (rotated 90 degrees)
+      svg2
+        .selectAll(".bar-text")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("class", "bar-text")
+        .attr("x", (d) => xScale(d.accuracy) + 10) // Adjust the horizontal position as needed
+        .attr("y", (d) => yScale(d.year) + yScale.bandwidth() / 2)
+        .attr("dy", "0.35em") // Center text vertically
+        .text((d) => d.name);
+
+      // Append title
+      svg2
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", -margin.top / 2)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text("Highest Annual Driving Accuracy Over 30 Years");
+
+      // Append x axis
+      svg2
+        .append("g")
+        .attr("transform", `translate(0, ${500})`)
+        .call(d3.axisBottom(xScale));
+
+      // Append y axis
+      svg2
+        .append("g")
+        .call(d3.axisLeft(yScale))
+        .selectAll("text")
+        .attr("dy", "0.32em");
+
+      // Append x axis label
+      svg2
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", 500 + margin.bottom - 10)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "18px")
+        .text("Driver Accuracy (Fairways Hit)- Top (800+ Possible)");
+
+      // Append y axis label
+      svg2
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -500 / 2)
+        .attr("y", -margin.left * 0.8)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "14px")
+        .text("Year");
+    });
+  </script>
+  <script>
+    // Define the size of the SVG container
+
+    // Append SVG to the container
+    const svg3 = d3
+      .select("#chart3")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    // Load data (assuming you have a CSV file with years and distances)
+    d3.csv("proximity.csv").then((data) => {
+      // Convert strings to numbers
+      data.forEach((d) => {
+        d.year = +d.year;
+        d.best = +d.best;
+        d.worst = +d.worst;
+      });
+
+      // Define scales
+      const xScale = d3
+        .scaleLinear()
+        .domain([65, d3.max(data, (d) => d.worst + 10)])
+        .range([0, width]);
+
+      const yScale = d3
+        .scaleBand()
+        .domain(data.map((d) => d.year))
+        .range([0, height])
+        .padding(0.1);
+
+      // Append dumbbells
+      svg3
+        .selectAll(".dot-best")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("class", "dot-best")
+        .attr("cx", (d) => xScale(d.best))
+        .attr("cy", (d) => yScale(d.year))
+        .attr("r", 5)
+        .attr("fill", "red");
+
+      svg3
+        .selectAll(".dot-worst")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("class", "dot-worst")
+        .attr("cx", (d) => xScale(d.worst))
+        .attr("cy", (d) => yScale(d.year))
+        .attr("r", 5)
+        .attr("fill", "green");
+
+      // Append lines connecting best and worst values
+      svg3
+        .selectAll(".connector")
+        .data(data)
+        .enter()
+        .append("line")
+        .attr("class", "connector")
+        .attr("x1", (d) => xScale(d.best))
+        .attr("y1", (d) => yScale(d.year))
+        .attr("x2", (d) => xScale(d.worst))
+        .attr("y2", (d) => yScale(d.year))
+        .attr("stroke", "black");
+
+      // Append title
+      svg3
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", -margin.top / 2)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .text("Avg Distance to Hole");
+
+      // Append x axis label
+      svg3
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom / 2)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "14px")
+        .text("Distance (inches)");
+
+      // Append y axis label
+      svg3
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -margin.left * 0.8)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "14px")
+        .text("Year");
+
+      // Append x axis
+      svg3
+        .append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale));
+
+      // Append y axis
+      svg3
+        .append("g")
+        .call(d3.axisLeft(yScale))
+        .selectAll("text")
+        .attr("dy", "0.32em");
+    });
+  </script>
+</html>
