@@ -12,6 +12,7 @@
     <style>
       #chart {
         background-color: white;
+        width: min-content;
       }
       .tooltip {
         position: absolute;
@@ -32,14 +33,13 @@
       #chart2 {
         margin-top: 100px;
         background-color: white;
+        width: min-content;
       }
 
       #chart3 {
         margin-top: 100px;
         background-color: white;
-      }
-      .bar {
-        fill: #003c80;
+        width: min-content;
       }
     </style>
   </head>
@@ -54,6 +54,7 @@
         >
       </p>
       <div id="chart"></div>
+
       <p style="color: white; font-size: larger; width: 50%">
         This chart visualizes the change in farthest annual drive over the
         course of 30 years. There is a clear trend upwards since 1993, which
@@ -196,10 +197,11 @@
     d3.csv("DrivingAvg(YrlyTop).csv").then((data) => {
       // Convert strings to numbers
       data.forEach((d) => {
-        // console.log(d);
+        console.log(d);
         d.year = +d.year;
         d.name = d.name;
         d.average = +d.average;
+        d.color = d.color;
       });
 
       // Define scales
@@ -230,19 +232,16 @@
         .attr("cx", (d) => xScale(d.year))
         .attr("cy", (d) => yScale(d.average))
         .attr("r", 5)
-        .attr("fill", "steelblue")
+        .attr("fill", (d) => d.color)
         .on("mouseover", function (event, d) {
           tooltip.transition().duration(200).style("opacity", 0.9);
-          const tooltipX =
-            event.pageX - document.getElementById("chart").offsetLeft; // Adjusted X position
-          const tooltipY =
-            event.pageY - document.getElementById("chart").offsetTop; // Adjusted Y position
+
           tooltip
             .html(
               `Name: ${data[d].name}<br/>Year: ${data[d].year}<br/>Average: ${data[d].average}`
             )
-            .style("left", tooltipX + "px")
-            .style("top", tooltipY + "px");
+            .style("left", d3.event.pageX + "px")
+            .style("top", d3.event.pageY + "px");
         })
         .on("mouseout", function (d) {
           tooltip.transition().duration(500).style("opacity", 0);
@@ -315,6 +314,7 @@
         d.year = +d.year;
         d.name = d.name;
         d.accuracy = +d.accuracy;
+        d.color = d.color;
       });
 
       // Find the golfer with the highest accuracy
@@ -344,17 +344,8 @@
         .attr("height", yScale.bandwidth())
         .attr("x", 0)
         .attr("width", (d) => xScale(d.accuracy))
-        .on("mouseover", function (event, d) {
-          tooltip2.transition().duration(200).style("opacity", 0.9);
-          const tooltipX =
-            event.pageX - document.getElementById("chart2").offsetLeft; // Adjusted X position
-          const tooltipY =
-            event.pageY - document.getElementById("chart2").offsetTop; // Adjusted Y position
-          tooltip
-            .html(`Name:`)
-            .style("left", tooltipX + "px")
-            .style("top", tooltipY + "px");
-        })
+        .attr("fill", (d) => d.color)
+        .on("mouseover", function (event, d) {})
         .on("mouseout", function (d) {
           tooltip2.transition().duration(500).style("opacity", 0);
         });
@@ -424,6 +415,12 @@
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    // Create tooltip
+    const tooltip3 = d3
+      .select("#chart3")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
     // Load data (assuming you have a CSV file with years and distances)
     d3.csv("proximity.csv").then((data) => {
@@ -456,7 +453,17 @@
         .attr("cx", (d) => xScale(d.best))
         .attr("cy", (d) => yScale(d.year))
         .attr("r", 5)
-        .attr("fill", "red");
+        .attr("fill", "green")
+        .on("mouseover", function (d) {
+          tooltip3.transition().duration(200).style("opacity", 0.9);
+          tooltip3
+            .html("Dist:" + d.best)
+            .style("left", d3.event.pageX - 70 + "px")
+            .style("top", d3.event.pageY - 20 + "px");
+        })
+        .on("mouseout", function (d) {
+          tooltip3.transition().duration(500).style("opacity", 0);
+        });
 
       svg3
         .selectAll(".dot-worst")
@@ -467,7 +474,17 @@
         .attr("cx", (d) => xScale(d.worst))
         .attr("cy", (d) => yScale(d.year))
         .attr("r", 5)
-        .attr("fill", "green");
+        .attr("fill", "red")
+        .on("mouseover", function (d) {
+          tooltip3.transition().duration(200).style("opacity", 0.9);
+          tooltip3
+            .html("Dist:" + d.best)
+            .style("left", d3.event.pageX + 20 + "px")
+            .style("top", d3.event.pageY - 20 + "px");
+        })
+        .on("mouseout", function (d) {
+          tooltip3.transition().duration(500).style("opacity", 0);
+        });
 
       // Append lines connecting best and worst values
       svg3
